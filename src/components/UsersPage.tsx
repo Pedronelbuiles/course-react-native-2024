@@ -1,25 +1,8 @@
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
-import { IReqResUserListResponse, IUser } from '../interfaces'
-
-const loadUsers = async ():Promise<IUser[]> => {
-    try {
-        const { data } = await axios.get<IReqResUserListResponse>('https://reqres.in/api/users')
-        return data.data
-    } catch (error) {
-        console.log(error)
-        return []
-    }
-}
+import { useUsers } from '../hooks/useUsers'
+import { UserRow } from './UserRow'
 
 export const UsersPage = () => {
-    const [usersSate, setUsersSate] = useState<IUser[]>([])
-
-    useEffect(() => {
-      loadUsers()
-        .then( users => setUsersSate(users))
-    }, [])
-    
+    const { usersSate, prevPage, nextPage } = useUsers()
 
   return (
     <>
@@ -35,17 +18,18 @@ export const UsersPage = () => {
             <tbody>
                 {
                     usersSate.map(user => (
-                        <tr>
-                            <td>
-                                <img src={user.avatar} />
-                            </td>
-                            <td>{user.first_name} {user.last_name}</td>
-                            <td>{user.email}</td>
-                        </tr>
+                        <UserRow key={user.id} user={user} />
                     ))
                 }
             </tbody>
         </table>
+
+        <div>
+            <button onClick={ prevPage }>Prev</button>
+            <button onClick={ nextPage }>Next</button>
+        </div>
     </>
   )
 }
+
+
